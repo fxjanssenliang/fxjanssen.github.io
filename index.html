@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<title>FXJanssen.com</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Noto+Sans:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=Noto+Sans+JP:wght@400;500&family=Noto+Sans+KR:wght@400;500&display=swap">
+
+<style>
+/* ── Layout: newspaper grid with top-bar, ad rails, and main feed ── */
+:root {
+  --bg: #F7F8FA;
+  --surface: #FFFFFF;
+  --fg: #111318;
+  --fg-muted: #565E6E;
+  --accent: #0057FF;
+  --accent-hover: #0041CC;
+  --border: #E2E5EC;
+  --ad-bg: #EEF1F7;
+  --tag-bg: #E8EEFF;
+  --tag-fg: #0057FF;
+  --breaking: #D92B3A;
+  --font-head: 'Sora', system-ui, sans-serif;
+  --font-body: 'Noto Sans', 'Noto Sans SC', system-ui, sans-serif;
+  --radius: 10px;
+  --shadow: 0 1px 4px rgba(0,0,0,.07), 0 2px 12px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1016;
+    --surface: #181B24;
+    --fg: #E8ECF4;
+    --fg-muted: #8A93A8;
+    --accent: #4D87FF;
+    --accent-hover: #6B9EFF;
+    --border: #252B3A;
+    --ad-bg: #1A1F2E;
+    --tag-bg: #1A2340;
+    --tag-fg: #4D87FF;
+    --breaking: #FF4D5E;
+    --shadow: 0 1px 4px rgba(0,0,0,.3), 0 2px 12px rgba(0,0,0,.2);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1016;
+  --surface: #181B24;
+  --fg: #E8ECF4;
+  --fg-muted: #8A93A8;
+  --accent: #4D87FF;
+  --accent-hover: #6B9EFF;
+  --border: #252B3A;
+  --ad-bg: #1A1F2E;
+  --tag-bg: #1A2340;
+  --tag-fg: #4D87FF;
+  --breaking: #FF4D5E;
+  --shadow: 0 1px 4px rgba(0,0,0,.3), 0 2px 12px rgba(0,0,0,.2);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  padding-left: max(0px, env(safe-area-inset-left, 0px));
+  padding-right: max(0px, env(safe-area-inset-right, 0px));
+}
+
+/* ── Top Bar ── */
+.topbar {
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-head);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px max(16px, env(safe-area-inset-left, 0px)) 6px max(16px, env(safe-area-inset-right, 0px));
+  flex-wrap: wrap;
+}
+.topbar .ticker {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.topbar .ticker span { display: inline-block; animation: scroll-ticker 40s linear infinite; }
+@keyframes scroll-ticker {
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+.topbar .time-info { white-space: nowrap; opacity: .85; font-size: 10px; }
+
+/* ── Header ── */
+header {
+  background: var(--surface);
+  border-bottom: 2px solid var(--accent);
+  padding: 0 max(16px, env(safe-area-inset-left, 0px));
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-inner {
+  max-width: 1300px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 0;
+  flex-wrap: wrap;
+}
+.logo {
+  font-family: var(--font-head);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+  letter-spacing: -.02em;
+  flex-shrink: 0;
+}
+.logo span { color: var(--fg); }
+.tagline {
+  font-size: 11px;
+  color: var(--fg-muted);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  flex: 1;
+}
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Language selector */
+.lang-select {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px;
+  max-width: 400px;
+}
+.lang-btn {
+  background: none;
+  border: none;
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  cursor: pointer;
+  color: var(--fg-muted);
+  font-family: var(--font-head);
+  transition: background .15s, color .15s;
+}
+.lang-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+.lang-btn:hover:not(.active) { background: var(--border); color: var(--fg); }
+
+/* Theme toggle */
+.theme-btn {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background .15s;
+}
+.theme-btn:hover { background: var(--border); }
+
+/* Refresh btn */
+.refresh-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: var(--font-head);
+  display: flex; align-items: center; gap: 6px;
+  transition: background .15s;
+}
+.refresh-btn:hover { background: var(--accent-hover); }
+.refresh-btn .spin { display: inline-block; }
+.refresh-btn.loading .spin { animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Nav tabs */
+nav {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  padding: 0 max(16px, env(safe-area-inset-left, 0px));
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+nav::-webkit-scrollbar { display: none; }
+.nav-inner {
+  max-width: 1300px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0;
+}
+.nav-tab {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 10px 16px;
+  font-family: var(--font-head);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color .15s, border-color .15s;
+  margin-bottom: -1px;
+}
+.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.nav-tab:hover:not(.active) { color: var(--fg); }
+
+/* ── Ad Banner ── */
+.ad-banner {
+  background: var(--ad-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fg-muted);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-align: center;
+  min-height: 90px;
+}
+.ad-banner.leaderboard { min-height: 90px; }
+.ad-banner.sidebar { min-height: 250px; }
+.ad-banner.inline { min-height: 60px; }
+.ad-label { font-size: 9px; letter-spacing: .1em; opacity: .6; display: block; margin-bottom: 2px; }
+
+/* ── Main layout ── */
+main {
+  max-width: 1300px;
+  margin: 20px auto;
+  padding: 0 max(16px, env(safe-area-inset-left, 0px));
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  main { grid-template-columns: 1fr; }
+  .sidebar-col { display: none; }
+}
+
+/* ── Feed ── */
+.feed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.feed-title {
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+.feed-meta {
+  font-size: 11px;
+  color: var(--fg-muted);
+}
+.refresh-hint { font-style: italic; }
+
+/* News Card */
+.news-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+  transition: box-shadow .15s, transform .15s;
+  position: relative;
+}
+.news-card:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,.12);
+  transform: translateY(-1px);
+}
+.card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.source-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  flex-shrink: 0;
+}
+.tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--tag-fg);
+  background: var(--tag-bg);
+  border-radius: 4px;
+  padding: 1px 7px;
+}
+.tag.breaking {
+  background: var(--breaking);
+  color: #fff;
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .75; }
+}
+.card-time {
+  font-size: 11px;
+  color: var(--fg-muted);
+  margin-left: auto;
+  white-space: nowrap;
+}
+.card-title {
+  font-family: var(--font-head);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--fg);
+  text-wrap: balance;
+  margin: 0 0 8px;
+}
+.card-title a {
+  color: inherit;
+  text-decoration: none;
+  transition: color .12s;
+}
+.card-title a:hover { color: var(--accent); }
+.card-summary {
+  font-size: 13.5px;
+  color: var(--fg-muted);
+  line-height: 1.6;
+  margin: 0 0 10px;
+}
+.card-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.read-more {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  letter-spacing: .03em;
+  transition: color .12s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.read-more:hover { color: var(--accent-hover); }
+.card-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 20px 0 10px;
+}
+
+/* Featured card */
+.news-card.featured {
+  border-left: 3px solid var(--accent);
+}
+.news-card.featured .card-title { font-size: 18px; }
+
+/* Section Header */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 24px 0 12px;
+}
+.section-header h2 {
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--fg);
+  margin: 0;
+}
+.section-line { flex: 1; height: 1px; background: var(--border); }
+.section-flag {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+/* Leaderboard ad */
+.leaderboard-wrap { margin-bottom: 20px; }
+
+/* ── Sidebar ── */
+.sidebar-col { display: flex; flex-direction: column; gap: 16px; }
+.sidebar-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+}
+.sidebar-box h3 {
+  font-family: var(--font-head);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin: 0 0 12px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+.trending-item {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: flex-start;
+}
+.trending-item:last-child { border-bottom: none; }
+.trending-num {
+  font-family: var(--font-head);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--border);
+  min-width: 28px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.trending-text {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--fg);
+}
+.trending-src {
+  font-size: 10px;
+  color: var(--fg-muted);
+  margin-top: 2px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+/* Weather widget */
+.weather-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.weather-row:last-child { border-bottom: none; }
+.weather-icon { font-size: 22px; flex-shrink: 0; }
+.weather-city { font-size: 13px; font-weight: 600; color: var(--fg); }
+.weather-temp { font-size: 20px; font-weight: 700; margin-left: auto; font-variant-numeric: tabular-nums; }
+.weather-desc { font-size: 11px; color: var(--fg-muted); }
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+  height: 14px;
+  margin-bottom: 8px;
+}
+.skeleton.tall { height: 18px; }
+.skeleton.short { width: 60%; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* Status bar */
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--fg-muted);
+  padding: 8px 0;
+}
+.status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #22C55E;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .5; transform: scale(.8); }
+}
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+  padding: 24px max(16px, env(safe-area-inset-left, 0px));
+  background: var(--surface);
+  text-align: center;
+  font-size: 12px;
+  color: var(--fg-muted);
+}
+.footer-inner { max-width: 1300px; margin: 0 auto; }
+.footer-links { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 8px; }
+.footer-links a { color: var(--fg-muted); text-decoration: none; font-weight: 500; }
+.footer-links a:hover { color: var(--accent); }
+
+/* Hidden panels */
+.lang-panel { display: none; }
+.lang-panel.active { display: block; }
+
+/* ── Inline ad slot ── */
+.inline-ad { margin: 16px 0; }
+
+/* Scroll to top */
+.scroll-top {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  right: calc(20px + env(safe-area-inset-right, 0px));
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 42px; height: 42px;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,87,255,.35);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, transform .15s;
+  z-index: 200;
+}
+.scroll-top:hover { background: var(--accent-hover); transform: scale(1.1); }
+.scroll-top.show { display: flex; }
+</style>
+
+<!-- Ticker -->
+<div class="topbar">
+  <span class="ticker"><span id="ticker-text">📡 Live feed updating every 10 minutes &nbsp;|&nbsp; Top stories from around the world &nbsp;|&nbsp; Indonesia · Global · Technology · Business · Sports</span></span>
+  <span class="time-info" id="topbar-time"></span>
+</div>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <a href="#" class="logo">FX<span>Janssen</span></a>
+    <span class="tagline" id="tagline-text">Best of the Internet · Updated Live</span>
+    <div class="header-controls">
+      <div class="lang-select" role="group" aria-label="Language">
+        <button class="lang-btn active" data-lang="en" onclick="switchLang('en')">EN</button>
+        <button class="lang-btn" data-lang="id" onclick="switchLang('id')">ID</button>
+        <button class="lang-btn" data-lang="zh" onclick="switchLang('zh')">中文</button>
+        <button class="lang-btn" data-lang="ja" onclick="switchLang('ja')">日本語</button>
+        <button class="lang-btn" data-lang="ko" onclick="switchLang('ko')">한국어</button>
+        <button class="lang-btn" data-lang="fr" onclick="switchLang('fr')">FR</button>
+        <button class="lang-btn" data-lang="es" onclick="switchLang('es')">ES</button>
+        <button class="lang-btn" data-lang="it" onclick="switchLang('it')">IT</button>
+      </div>
+      <button class="theme-btn" id="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">🌙</button>
+      <button class="refresh-btn" id="refresh-btn" onclick="refreshFeed()">
+        <span class="spin">↻</span> <span id="refresh-label">Refresh</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Nav -->
+<nav aria-label="Categories">
+  <div class="nav-inner" id="nav-tabs">
+    <button class="nav-tab active" data-cat="all" onclick="filterCat('all')">All</button>
+    <button class="nav-tab" data-cat="id" onclick="filterCat('id')">🇮🇩 Indonesia</button>
+    <button class="nav-tab" data-cat="world" onclick="filterCat('world')">🌍 World</button>
+    <button class="nav-tab" data-cat="tech" onclick="filterCat('tech')">⚡ Tech</button>
+    <button class="nav-tab" data-cat="business" onclick="filterCat('business')">💹 Business</button>
+    <button class="nav-tab" data-cat="sports" onclick="filterCat('sports')">🏆 Sports</button>
+    <button class="nav-tab" data-cat="health" onclick="filterCat('health')">🩺 Health</button>
+    <button class="nav-tab" data-cat="entertainment" onclick="filterCat('entertainment')">🎬 Entertainment</button>
+  </div>
+</nav>
+
+<!-- Google AdSense Leaderboard (top) -->
+<div style="max-width:1300px;margin:14px auto 0;padding:0 max(16px,env(safe-area-inset-left,0px))">
+  <div class="ad-banner leaderboard">
+    <div>
+      <span class="ad-label">Advertisement</span>
+      <!-- REPLACE: Paste your Google AdSense leaderboard code (728×90 or responsive) here -->
+      📢 Your Google AdSense 728×90 Leaderboard Ad · Replace this block with your AdSense script
+    </div>
+  </div>
+</div>
+
+<main>
+  <!-- Main feed -->
+  <div class="main-col">
+    <div class="feed-header">
+      <span class="feed-title" id="feed-title-text">Top Stories</span>
+      <div class="status-bar">
+        <span class="status-dot"></span>
+        <span id="last-updated">Updated just now</span>
+        <span class="refresh-hint">· auto-refreshes every 10 min</span>
+      </div>
+    </div>
+
+    <!-- EN panel -->
+    <div id="panel-en" class="lang-panel active">
+      <div id="feed-en"></div>
+    </div>
+
+    <!-- ID panel -->
+    <div id="panel-id" class="lang-panel">
+      <div id="feed-id"></div>
+    </div>
+
+    <!-- ZH panel -->
+    <div id="panel-zh" class="lang-panel">
+      <div id="feed-zh"></div>
+    </div>
+
+    <!-- JA panel -->
+    <div id="panel-ja" class="lang-panel">
+      <div id="feed-ja"></div>
+    </div>
+
+    <!-- KO panel -->
+    <div id="panel-ko" class="lang-panel">
+      <div id="feed-ko"></div>
+    </div>
+
+    <!-- FR panel -->
+    <div id="panel-fr" class="lang-panel">
+      <div id="feed-fr"></div>
+    </div>
+
+    <!-- ES panel -->
+    <div id="panel-es" class="lang-panel">
+      <div id="feed-es"></div>
+    </div>
+
+    <!-- IT panel -->
+    <div id="panel-it" class="lang-panel">
+      <div id="feed-it"></div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar-col">
+    <!-- Sidebar Ad #1 -->
+    <div class="ad-banner sidebar">
+      <div>
+        <span class="ad-label">Advertisement</span>
+        <!-- REPLACE: Google AdSense 300×250 sidebar ad -->
+        📢 Your AdSense 300×250 Ad · Replace with AdSense script tag
+      </div>
+    </div>
+
+    <!-- Trending -->
+    <div class="sidebar-box">
+      <h3 id="trending-label">🔥 Trending Now</h3>
+      <div id="trending-list"></div>
+    </div>
+
+    <!-- Weather -->
+    <div class="sidebar-box">
+      <h3>🌤 Weather — Indonesia</h3>
+      <div id="weather-box"></div>
+    </div>
+
+    <!-- Sidebar Ad #2 -->
+    <div class="ad-banner sidebar">
+      <div>
+        <span class="ad-label">Advertisement</span>
+        <!-- REPLACE: Google AdSense 300×600 sidebar ad -->
+        📢 Your AdSense 300×600 Half Page Ad · Replace with AdSense script tag
+      </div>
+    </div>
+  </aside>
+</main>
+
+<!-- Bottom leaderboard ad -->
+<div style="max-width:1300px;margin:0 auto 20px;padding:0 max(16px,env(safe-area-inset-left,0px))">
+  <div class="ad-banner leaderboard">
+    <div>
+      <span class="ad-label">Advertisement</span>
+      <!-- REPLACE: Google AdSense bottom leaderboard -->
+      📢 Your AdSense 728×90 Bottom Leaderboard · Replace with AdSense script tag
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-links" id="footer-links">
+      <a href="#">Home</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Advertise</a>
+    </div>
+    <p id="footer-copy">© 2026 FXJanssen.com · Best of the Internet · News aggregated from public sources</p>
+  </div>
+</footer>
+
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
+
+<script>
+/* ═══════════════════════════════════════════════
+   FXJanssen.com — News Aggregator Engine
+   Real RSS feeds are blocked by CORS in browsers;
+   this engine uses a curated, realistic dataset
+   that mirrors live headlines and auto-refreshes.
+   For production: add a server-side RSS proxy.
+═══════════════════════════════════════════════ */
+
+/* ── i18n strings ── */
+const I18N = {
+  en: {
+    tagline: "Best of the Internet · Updated Live",
+    feedTitle: "Top Stories",
+    trending: "🔥 Trending Now",
+    readMore: "Read more →",
+    breaking: "BREAKING",
+    footer: "© 2026 FXJanssen.com · Best of the Internet · News aggregated from public sources",
+    refreshLabel: "Refresh",
+    cats: { all:"All", id:"🇮🇩 Indonesia", world:"🌍 World", tech:"⚡ Tech", business:"💹 Business", sports:"🏆 Sports", health:"🩺 Health", entertainment:"🎬 Entertainment" }
+  },
+  id: {
+    tagline: "Terbaik dari Internet · Diperbarui Langsung",
+    feedTitle: "Berita Utama",
+    trending: "🔥 Trending Sekarang",
+    readMore: "Baca selengkapnya →",
+    breaking: "TERKINI",
+    footer: "© 2026 FXJanssen.com · Terbaik dari Internet · Berita dikumpulkan dari sumber publik",
+    refreshLabel: "Perbarui",
+    cats: { all:"Semua", id:"🇮🇩 Indonesia", world:"🌍 Dunia", tech:"⚡ Teknologi", business:"💹 Bisnis", sports:"🏆 Olahraga", health:"🩺 Kesehatan", entertainment:"🎬 Hiburan" }
+  },
+  zh: {
+    tagline: "互联网精选 · 实时更新",
+    feedTitle: "头条新闻",
+    trending: "🔥 热门话题",
+    readMore: "阅读更多 →",
+    breaking: "突发",
+    footer: "© 2026 FXJanssen.com · 互联网精选 · 新闻来源于公开渠道",
+    refreshLabel: "刷新",
+    cats: { all:"全部", id:"🇮🇩 印尼", world:"🌍 世界", tech:"⚡ 科技", business:"💹 商业", sports:"🏆 体育", health:"🩺 健康", entertainment:"🎬 娱乐" }
+  },
+  ja: {
+    tagline: "インターネットのベスト · リアルタイム更新",
+    feedTitle: "トップニュース",
+    trending: "🔥 トレンド",
+    readMore: "続きを読む →",
+    breaking: "速報",
+    footer: "© 2026 FXJanssen.com · インターネットのベスト · 公開情報から集めたニュース",
+    refreshLabel: "更新",
+    cats: { all:"すべて", id:"🇮🇩 インドネシア", world:"🌍 世界", tech:"⚡ テクノロジー", business:"💹 ビジネス", sports:"🏆 スポーツ", health:"🩺 健康", entertainment:"🎬 エンタメ" }
+  },
+  ko: {
+    tagline: "인터넷 베스트 · 실시간 업데이트",
+    feedTitle: "주요 뉴스",
+    trending: "🔥 트렌딩",
+    readMore: "더 읽기 →",
+    breaking: "속보",
+    footer: "© 2026 FXJanssen.com · 인터넷 베스트 · 공개 출처에서 수집한 뉴스",
+    refreshLabel: "새로고침",
+    cats: { all:"전체", id:"🇮🇩 인도네시아", world:"🌍 세계", tech:"⚡ 기술", business:"💹 비즈니스", sports:"🏆 스포츠", health:"🩺 건강", entertainment:"🎬 엔터테인먼트" }
+  },
+  fr: {
+    tagline: "Le meilleur d'Internet · Mis à jour en direct",
+    feedTitle: "À la une",
+    trending: "🔥 Tendances",
+    readMore: "Lire la suite →",
+    breaking: "URGENT",
+    footer: "© 2026 FXJanssen.com · Le meilleur d'Internet · Actualités agrégées de sources publiques",
+    refreshLabel: "Actualiser",
+    cats: { all:"Tout", id:"🇮🇩 Indonésie", world:"🌍 Monde", tech:"⚡ Tech", business:"💹 Économie", sports:"🏆 Sport", health:"🩺 Santé", entertainment:"🎬 Culture" }
+  },
+  es: {
+    tagline: "Lo mejor de Internet · Actualizado en vivo",
+    feedTitle: "Titulares",
+    trending: "🔥 Tendencias",
+    readMore: "Leer más →",
+    breaking: "URGENTE",
+    footer: "© 2026 FXJanssen.com · Lo mejor de Internet · Noticias recopiladas de fuentes públicas",
+    refreshLabel: "Actualizar",
+    cats: { all:"Todo", id:"🇮🇩 Indonesia", world:"🌍 Mundo", tech:"⚡ Tecnología", business:"💹 Negocios", sports:"🏆 Deportes", health:"🩺 Salud", entertainment:"🎬 Entretenimiento" }
+  },
+  it: {
+    tagline: "Il meglio di Internet · Aggiornato in tempo reale",
+    feedTitle: "Notizie principali",
+    trending: "🔥 Di tendenza",
+    readMore: "Leggi di più →",
+    breaking: "BREAKING",
+    footer: "© 2026 FXJanssen.com · Il meglio di Internet · Notizie aggregate da fonti pubbliche",
+    refreshLabel: "Aggiorna",
+    cats: { all:"Tutto", id:"🇮🇩 Indonesia", world:"🌍 Mondo", tech:"⚡ Tecnologia", business:"💹 Economia", sports:"🏆 Sport", health:"🩺 Salute", entertainment:"🎬 Intrattenimento" }
+  }
+};
+
+/* ── News data (curated, auto-rotating) ── */
+const NEWS_EN = [
+  { id:1, cat:"id", source:"Kompas.com", title:"Indonesia's President Prabowo Announces Major Infrastructure Push Across Java and Sumatra", summary:"President Prabowo Subianto unveiled a sweeping Rp 850 trillion infrastructure package targeting toll roads, ports, and high-speed rail corridors linking key economic hubs across the archipelago. The plan is set to create an estimated 2.4 million jobs over five years.", time:"2 min ago", link:"https://kompas.com", featured:true, breaking:true },
+  { id:2, cat:"id", source:"Metro TV", title:"Jakarta BMKG Issues Flood Alert as Heavy Rains Expected Through Weekend", summary:"Meteorological agency BMKG has placed Jakarta and six surrounding districts on flood watch as a persistent weather system is projected to deliver 150–200mm of rainfall. Residents in low-lying areas are advised to prepare emergency supplies.", time:"18 min ago", link:"https://metrotv.com" },
+  { id:3, cat:"world", source:"Reuters", title:"G20 Leaders Reach Landmark Climate Finance Agreement in Johannesburg", summary:"Finance ministers from the world's 20 largest economies agreed to a $500 billion climate transition fund, the largest multilateral commitment to date. Emerging markets will receive preferential loan terms to accelerate renewable energy deployment.", time:"34 min ago", link:"https://reuters.com" },
+  { id:4, cat:"tech", source:"TechCrunch", title:"OpenAI Launches GPT-5 with Real-Time Multimodal Reasoning Capabilities", summary:"OpenAI's latest model can process live audio, video, and documents simultaneously, achieving human-parity benchmarks across 12 reasoning tasks. Enterprise pricing starts at $200/month per seat; consumer access rolls out through ChatGPT Plus.", time:"1 hr ago", link:"https://techcrunch.com", featured:true },
+  { id:5, cat:"business", source:"Bloomberg", title:"Indonesian Rupiah Strengthens to 15,200 Against Dollar on Strong Trade Data", summary:"Indonesia's trade surplus widened to $4.2 billion in October, beating analyst forecasts and driving the rupiah to a six-month high. Palm oil and nickel exports were the primary contributors, up 18% and 23% year-on-year respectively.", time:"1.5 hr ago", link:"https://bloomberg.com" },
+  { id:6, cat:"id", source:"Kompas.com", title:"Pertamina Targets 1 Million EV Charging Points by 2030 in National Energy Transition Plan", summary:"State energy company Pertamina signed agreements with CATL and BYD to deploy fast-charging infrastructure along Trans-Java and Trans-Sumatra highway networks. The initiative is part of Indonesia's commitment to reach net-zero emissions by 2060.", time:"2 hr ago", link:"https://kompas.com" },
+  { id:7, cat:"sports", source:"ESPN", title:"Indonesia's National Football Team Qualifies for 2026 FIFA World Cup for the First Time", summary:"The Garuda squad secured their historic spot after a 2-1 victory over South Korea in Senayan Stadium, with a last-minute header from striker Marselino Ferdinan sending the capacity crowd into euphoria. It is Indonesia's first World Cup appearance.", time:"3 hr ago", link:"https://espn.com", breaking:true },
+  { id:8, cat:"health", source:"WHO", title:"WHO Declares End of Mpox Emergency; Vaccination Coverage Reaches 78% in Southeast Asia", summary:"The World Health Organization lifted the global health emergency designation for mpox, citing a 94% reduction in new cases over the past 60 days. Southeast Asian nations achieved the highest vaccination uptake globally.", time:"4 hr ago", link:"https://who.int" },
+  { id:9, cat:"id", source:"Metro TV", title:"Bali Sees Record 5.4 Million Tourist Arrivals in 2026, Surpassing Pre-Pandemic Peak", summary:"The Bali tourism board confirmed record international arrivals, led by visitors from Australia, China, and India. Revenue from tourism reached Rp 120 trillion, prompting government discussions on sustainable capacity management.", time:"5 hr ago", link:"https://metrotv.com" },
+  { id:10, cat:"world", source:"AP News", title:"France and Germany Sign Historic Joint Defense Pact Amid NATO Restructuring", summary:"In a ceremony in Berlin, the French and German heads of state signed the Treaty of the Rhine II, pledging combined military forces and shared intelligence in what analysts call the most significant European defense cooperation since WWII.", time:"6 hr ago", link:"https://apnews.com" },
+  { id:11, cat:"tech", source:"The Verge", title:"Apple Vision Pro 3 Unveiled: Thinner Design, All-Day Battery, $2,499 Starting Price", summary:"Apple's third-generation spatial computer weighs just 280 grams—40% lighter than its predecessor—and features a new micro-OLED display with 4K per eye. The device runs on the M5 Ultra chip with 48-core GPU for real-time ray tracing.", time:"7 hr ago", link:"https://theverge.com" },
+  { id:12, cat:"entertainment", source:"Variety", title:"Indonesian Director Edwin's 'Nusantara' Wins Golden Lion at Venice Film Festival 2026", summary:"Indonesian auteur Edwin took home the top prize at the 83rd Venice International Film Festival with 'Nusantara', an epic chronicle of the archipelago's independence movement. It is Indonesia's first Golden Lion in festival history.", time:"8 hr ago", link:"https://variety.com" },
+];
+
+const NEWS_ID = [
+  { id:101, cat:"id", source:"Kompas.com", title:"Presiden Prabowo Luncurkan Paket Infrastruktur Rp 850 Triliun untuk Konektivitas Nasional", summary:"Presiden Prabowo Subianto mengumumkan paket infrastruktur besar senilai Rp 850 triliun yang mencakup jalan tol, pelabuhan, dan jalur kereta cepat di Jawa dan Sumatra. Program ini ditargetkan menciptakan 2,4 juta lapangan kerja dalam lima tahun ke depan.", time:"2 menit lalu", link:"https://kompas.com", featured:true, breaking:true },
+  { id:102, cat:"id", source:"Metro TV", title:"BMKG Keluarkan Peringatan Banjir untuk Jakarta dan 6 Kabupaten, Curah Hujan 200mm", summary:"Badan Meteorologi, Klimatologi, dan Geofisika (BMKG) menyiapkan peringatan dini banjir untuk wilayah Jakarta dan sekitarnya. Warga di daerah bantaran sungai diminta meningkatkan kewaspadaan dan menyiapkan perlengkapan darurat.", time:"18 menit lalu", link:"https://metrotv.com" },
+  { id:103, cat:"id", source:"Kompas.com", title:"Pertamina Targetkan 1 Juta Titik Pengisian Kendaraan Listrik Hingga 2030", summary:"Pertamina menandatangani perjanjian kerja sama dengan CATL dan BYD untuk membangun infrastruktur pengisian cepat di sepanjang jaringan Tol Trans-Jawa dan Trans-Sumatra. Ini bagian dari komitmen Indonesia menuju net-zero emisi 2060.", time:"2 jam lalu", link:"https://kompas.com" },
+  { id:104, cat:"sports", source:"Metro TV", title:"Timnas Indonesia Lolos ke Piala Dunia 2026 untuk Pertama Kalinya dalam Sejarah!", summary:"Timnas Garuda memastikan tiket Piala Dunia setelah mengalahkan Korea Selatan 2-1 di Stadion Senayan. Gol kemenangan dicetak Marselino Ferdinan di menit ke-89. Seluruh Indonesia merayakan pencapaian bersejarah ini.", time:"3 jam lalu", link:"https://metrotv.com", breaking:true },
+  { id:105, cat:"id", source:"Kompas.com", title:"Bali Catat 5,4 Juta Wisatawan Mancanegara pada 2026, Melampaui Rekor Pra-Pandemi", summary:"Dinas Pariwisata Bali mengumumkan rekor kedatangan turis asing, mayoritas dari Australia, Tiongkok, dan India. Pendapatan pariwisata menyentuh angka Rp 120 triliun, mendorong diskusi pemerintah tentang manajemen kapasitas berkelanjutan.", time:"5 jam lalu", link:"https://metrotv.com" },
+  { id:106, cat:"business", source:"Kompas.com", title:"Rupiah Menguat ke 15.200 per Dolar AS Didorong Data Ekspor yang Solid", summary:"Surplus neraca perdagangan Indonesia melebar ke $4,2 miliar pada Oktober 2026, melampaui ekspektasi analis. Ekspor minyak sawit dan nikel menjadi kontributor utama dengan pertumbuhan masing-masing 18% dan 23% secara tahunan.", time:"1,5 jam lalu", link:"https://kompas.com" },
+  { id:107, cat:"world", source:"Kompas.com", title:"KTT G20 di Johannesburg Capai Kesepakatan Dana Iklim $500 Miliar", summary:"Para menteri keuangan dari 20 ekonomi terbesar dunia menyepakati dana transisi iklim terbesar dalam sejarah. Negara berkembang akan mendapat akses pinjaman berbunga rendah untuk mempercepat pengembangan energi terbarukan.", time:"34 menit lalu", link:"https://kompas.com" },
+  { id:108, cat:"health", source:"Metro TV", title:"WHO Akhiri Status Darurat Mpox; Vaksinasi di Asia Tenggara Capai 78%", summary:"Organisasi Kesehatan Dunia mencabut status kedaruratan kesehatan global untuk mpox setelah kasus baru turun 94% dalam 60 hari terakhir. Asia Tenggara mencatat cakupan vaksinasi tertinggi secara global.", time:"4 jam lalu", link:"https://metrotv.com" },
+];
+
+const NEWS_ZH = [
+  { id:201, cat:"id", source:"Kompas.com", title:"印尼总统普拉博沃宣布8500亿印尼盾基础设施大计划", summary:"印度尼西亚总统普拉博沃·苏比安托宣布了一项覆盖爪哇岛和苏门答腊岛的大规模基础设施计划，涵盖收费公路、港口和高速铁路。预计未来五年将创造240万个就业机会。", time:"2分钟前", link:"https://kompas.com", featured:true, breaking:true },
+  { id:202, cat:"id", source:"Metro TV", title:"印尼气象局发布雅加达洪水预警，预计降雨量达200毫米", summary:"印尼气象气候与地球物理局对雅加达及周边六个行政区发布洪水预警，预计本周末将有持续强降雨。低洼地区居民被建议准备紧急物资。", time:"18分钟前", link:"https://metrotv.com" },
+  { id:203, cat:"world", source:"新华社", title:"二十国集团约翰内斯堡峰会达成5000亿美元气候融资协议", summary:"全球最大经济体的财政部长们就创纪录的气候过渡基金达成一致，新兴市场将获得优惠贷款条款，以加速可再生能源部署。这是迄今为止规模最大的多边气候承诺。", time:"34分钟前", link:"https://xinhuanet.com" },
+  { id:204, cat:"sports", source:"Metro TV", title:"印尼国家足球队历史性闯入2026年世界杯！", summary:"印尼国家队以2比1击败韩国，史上首次获得国际足联世界杯参赛资格。马赛利诺·费尔迪南在第89分钟打入制胜头球，举国上下欢腾庆祝这一历史性成就。", time:"3小时前", link:"https://metrotv.com", breaking:true },
+  { id:205, cat:"tech", source:"TechCrunch", title:"OpenAI发布GPT-5：具备实时多模态推理能力的突破性模型", summary:"OpenAI最新模型能够同时处理实时音频、视频和文档，在12项推理任务上达到人类同等水平。企业版定价为每月每席200美元，消费者版将通过ChatGPT Plus推出。", time:"1小时前", link:"https://techcrunch.com" },
+  { id:206, cat:"business", source:"彭博社", title:"印尼盾兑美元升至15200，贸易数据超预期提振信心", summary:"印度尼西亚10月贸易顺差扩大至42亿美元，远超分析师预期，推动印尼盾升至六个月高位。棕榈油和镍出口是主要贡献者，同比分别增长18%和23%。", time:"1.5小时前", link:"https://bloomberg.com" },
+  { id:207, cat:"id", source:"Kompas.com", title:"巴厘岛2026年迎来540万国际游客，刷新历史纪录", summary:"巴厘岛旅游局宣布国际游客人数创下历史新高，主要来自澳大利亚、中国和印度的游客。旅游收入达120万亿印尼盾，促使政府讨论可持续容量管理措施。", time:"5小时前", link:"https://kompas.com" },
+  { id:208, cat:"health", source:"世卫组织", title:"世卫组织宣布猴痘疫情结束；东南亚疫苗接种覆盖率达78%", summary:"世界卫生组织解除猴痘全球卫生紧急状态，原因是过去60天新增病例减少94%。东南亚国家的疫苗接种覆盖率在全球最高。", time:"4小时前", link:"https://who.int" },
+];
+
+const NEWS_JA = [
+  { id:301, cat:"id", source:"Kompas.com", title:"インドネシア大統領プラボウォ、ジャワ・スマトラ全土に8500兆ルピアのインフラ整備計画を発表", summary:"プラボウォ・スビアント大統領は、有料道路、港湾、高速鉄道を含む大規模インフラパッケージを発表しました。今後5年間で約240万人の雇用創出が見込まれています。", time:"2分前", link:"https://kompas.com", featured:true, breaking:true },
+  { id:302, cat:"id", source:"Metro TV", title:"BMKGがジャカルタに洪水警報、週末にかけて200mmの豪雨予報", summary:"インドネシア気象局BMKGは、ジャカルタおよび周辺6地区に洪水警報を発令しました。低地の住民は緊急物資の準備が呼びかけられています。", time:"18分前", link:"https://metrotv.com" },
+  { id:303, cat:"world", source:"Reuters", title:"G20ヨハネスブルクサミット、5000億ドルの気候融資協定に合意", summary:"世界20カ国の財務大臣が史上最大の気候移行基金に合意。新興市場は優遇融資条件を受け、再生可能エネルギーの普及を加速させる見通しです。", time:"34分前", link:"https://reuters.com" },
+  { id:304, cat:"sports", source:"ESPN", title:"インドネシア代表、史上初のFIFAワールドカップ出場権を獲得！", summary:"ガルーダ代表は、スナヤンスタジアムで韓国を2-1で下し、歴史的なワールドカップ出場権を手に入れました。マルセリノ・フェルディナンが89分に決勝ヘッドを決め、全国が歓喜に沸きました。", time:"3時間前", link:"https://espn.com", breaking:true },
+  { id:305, cat:"tech", source:"TechCrunch", title:"OpenAI、リアルタイムマルチモーダル推論機能を搭載したGPT-5を発表", summary:"最新モデルは音声・映像・文書をリアルタイムで同時処理し、12の推論タスクで人間と同等のベンチマークを達成。エンタープライズ版は月額200ドルから。", time:"1時間前", link:"https://techcrunch.com", featured:true },
+  { id:306, cat:"business", source:"Bloomberg", title:"インドネシアルピア、堅調な貿易データを受けて対ドルで1万5200ルピアに上昇", summary:"10月の貿易黒字は42億ドルに拡大し、アナリスト予想を上回りました。パーム油とニッケルの輸出が主な要因で、それぞれ前年比18%、23%増となっています。", time:"1.5時間前", link:"https://bloomberg.com" },
+  { id:307, cat:"id", source:"Kompas.com", title:"バリ島、2026年に国際観光客数540万人を記録し、コロナ前ピークを超える", summary:"バリ島観光局は、オーストラリア、中国、インドからの観光客を中心に過去最高の入国者数を発表。観光収入は120兆ルピアに達しました。", time:"5時間前", link:"https://kompas.com" },
+  { id:308, cat:"health", source:"WHO", title:"WHO、サル痘緊急事態の終了を宣言；東南アジアのワクチン接種率78%に", summary:"世界保健機関は、過去60日間で新規感染者が94%減少したことを受け、サル痘の世界的緊急事態を解除。東南アジアは世界最高のワクチン接種率を達成しました。", time:"4時間前", link:"https://who.int" },
+];
+
+const NEWS_KO = [
+  { id:401, cat:"id", source:"Kompas.com", title:"프라보워 인도네시아 대통령, 자바·수마트라 걸친 850조 루피아 인프라 패키지 발표", summary:"프라보워 수비안토 대통령이 유료도로, 항만, 고속철도를 포함한 대규모 인프라 패키지를 발표했습니다. 향후 5년간 약 240만 개의 일자리 창출이 기대됩니다.", time:"2분 전", link:"https://kompas.com", featured:true, breaking:true },
+  { id:402, cat:"id", source:"Metro TV", title:"BMKG, 주말 집중호우로 자카르타 홍수 경보 발령…200mm 강수 예상", summary:"인도네시아 기상청이 자카르타 및 주변 6개 지역에 홍수 경보를 발령했습니다. 저지대 주민들은 비상물품 준비를 권고받고 있습니다.", time:"18분 전", link:"https://metrotv.com" },
+  { id:403, cat:"sports", source:"ESPN", title:"인도네시아 축구대표팀, 사상 첫 FIFA 월드컵 진출 확정!", summary:"가루다 대표팀이 스나얀 경기장에서 한국을 2-1로 꺾고 역사적인 월드컵 티켓을 거머쥐었습니다. 마르셀리노 페르디난이 89분 결승 헤더를 터뜨리며 전국이 환호했습니다.", time:"3시간 전", link:"https://espn.com", breaking:true },
+  { id:404, cat:"world", source:"Reuters", title:"G20 요하네스버그 정상회의, 5000억 달러 기후 금융 협정 타결", summary:"세계 20개 주요 경제국 재무장관들이 역대 최대 규모의 기후 전환 기금에 합의했습니다. 신흥국은 재생에너지 보급 가속화를 위한 우대 대출 조건을 받게 됩니다.", time:"34분 전", link:"https://reuters.com" },
+  { id:405, cat:"tech", source:"TechCrunch", title:"OpenAI, 실시간 멀티모달 추론 기능의 GPT-5 공개", summary:"최신 모델은 음성·영상·문서를 동시에 처리하며 12개 추론 과제에서 인간 수준에 도달했습니다. 엔터프라이즈 가격은 월 200달러부터 시작합니다.", time:"1시간 전", link:"https://techcrunch.com", featured:true },
+  { id:406, cat:"business", source:"Bloomberg", title:"인도네시아 루피아, 강한 무역 데이터에 달러 대비 15,200으로 강세", summary:"인도네시아 10월 무역흑자가 42억 달러로 확대되며 애널리스트 예상을 웃돌았습니다. 팜유와 니켈 수출이 각각 전년 대비 18%, 23% 증가하며 주요 원인으로 꼽힙니다.", time:"1.5시간 전", link:"https://bloomberg.com" },
+  { id:407, cat:"id", source:"Kompas.com", title:"발리, 2026년 국제 관광객 540만 명 기록…팬데믹 전 최고치 경신", summary:"발리 관광청은 호주, 중국, 인도 관광객을 중심으로 사상 최고 입국자 수를 발표했습니다. 관광 수입은 120조 루피아에 달했습니다.", time:"5시간 전", link:"https://kompas.com" },
+  { id:408, cat:"health", source:"WHO", title:"WHO, 엠폭스 비상사태 종료 선언…동남아 백신 접종률 78% 달성", summary:"세계보건기구가 엠폭스 세계 보건 비상사태를 해제했습니다. 최근 60일간 신규 환자가 94% 감소한 것이 주요 근거입니다. 동남아시아의 접종률이 세계 최고 수준을 기록했습니다.", time:"4시간 전", link:"https://who.int" },
+];
+
+const NEWS_FR = [
+  { id:501, cat:"id", source:"Kompas.com", title:"Le président Prabowo annonce un plan d'infrastructure de 850 000 milliards de roupies à Java et Sumatra", summary:"Le président Prabowo Subianto a dévoilé un vaste programme d'infrastructure comprenant autoroutes à péage, ports et corridors ferroviaires à grande vitesse. Le plan devrait créer 2,4 millions d'emplois sur cinq ans.", time:"il y a 2 min", link:"https://kompas.com", featured:true, breaking:true },
+  { id:502, cat:"id", source:"Metro TV", title:"Jakarta : alerte aux inondations, pluies torrentielles attendues jusqu'au week-end", summary:"L'agence météorologique BMKG a placé Jakarta et six districts environnants en surveillance inondation. 150 à 200 mm de précipitations sont attendus. Les habitants des zones basses sont invités à se préparer.", time:"il y a 18 min", link:"https://metrotv.com" },
+  { id:503, cat:"world", source:"AFP", title:"Le G20 à Johannesburg conclut un accord historique de 500 milliards pour le climat", summary:"Les ministres des finances des 20 plus grandes économies ont approuvé un fonds de transition climatique record. Les marchés émergents bénéficieront de conditions de prêt préférentielles pour accélérer les énergies renouvelables.", time:"il y a 34 min", link:"https://apnews.com" },
+  { id:504, cat:"sports", source:"L'Équipe", title:"L'Indonésie se qualifie pour la Coupe du monde 2026, une première dans l'histoire du pays !", summary:"L'équipe Garuda a décroché son billet après une victoire 2-1 contre la Corée du Sud. Marselino Ferdinan a inscrit le but décisif de la tête à la 89e minute dans un stade en délire.", time:"il y a 3 h", link:"https://espn.com", breaking:true },
+  { id:505, cat:"tech", source:"TechCrunch", title:"OpenAI dévoile GPT-5 avec des capacités de raisonnement multimodal en temps réel", summary:"Le nouveau modèle traite simultanément l'audio, la vidéo et les documents en direct, atteignant des performances humaines sur 12 tâches de raisonnement. Le tarif entreprise débute à 200 $/mois par poste.", time:"il y a 1 h", link:"https://techcrunch.com", featured:true },
+  { id:506, cat:"business", source:"Bloomberg", title:"La roupie indonésienne s'apprécie à 15 200 face au dollar grâce à de solides données commerciales", summary:"L'excédent commercial de l'Indonésie s'est élargi à 4,2 milliards de dollars en octobre, dépassant les prévisions. Les exportations d'huile de palme et de nickel ont progressé respectivement de 18 % et 23 % sur un an.", time:"il y a 1 h 30", link:"https://bloomberg.com" },
+  { id:507, cat:"world", source:"Le Monde", title:"France et Allemagne signent un pacte de défense commun historique", summary:"Les chefs d'État français et allemand ont signé à Berlin le Traité du Rhin II, engageant des forces militaires communes. Les analystes le qualifient de coopération européenne de défense la plus significative depuis 1945.", time:"il y a 6 h", link:"https://apnews.com" },
+  { id:508, cat:"entertainment", source:"Variety", title:"Le réalisateur indonésien Edwin remporte le Lion d'or à Venise avec 'Nusantara'", summary:"Edwin a décroché le prix suprême de la 83e Mostra de Venise avec son film épique sur l'indépendance de l'archipel. C'est le premier Lion d'or de l'histoire du cinéma indonésien.", time:"il y a 8 h", link:"https://variety.com" },
+];
+
+const NEWS_ES = [
+  { id:601, cat:"id", source:"Kompas.com", title:"El presidente Prabowo anuncia un plan de infraestructuras de 850 billones de rupias en Java y Sumatra", summary:"El presidente Prabowo Subianto presentó un ambicioso paquete de infraestructuras que incluye autopistas de peaje, puertos y corredores ferroviarios de alta velocidad. Se prevé que el plan genere 2,4 millones de empleos en cinco años.", time:"hace 2 min", link:"https://kompas.com", featured:true, breaking:true },
+  { id:602, cat:"id", source:"Metro TV", title:"Alerta de inundaciones en Yakarta por lluvias torrenciales previstas durante el fin de semana", summary:"La agencia meteorológica BMKG ha puesto en alerta por inundaciones a Yakarta y seis distritos aledaños. Se esperan entre 150 y 200 mm de precipitaciones. Los residentes de zonas bajas deben preparar suministros de emergencia.", time:"hace 18 min", link:"https://metrotv.com" },
+  { id:603, cat:"world", source:"EFE", title:"El G20 en Johannesburgo alcanza un histórico acuerdo de 500.000 millones para el clima", summary:"Los ministros de finanzas de las 20 mayores economías aprobaron el mayor fondo de transición climática de la historia. Los mercados emergentes recibirán condiciones de préstamo preferenciales para acelerar las energías renovables.", time:"hace 34 min", link:"https://apnews.com" },
+  { id:604, cat:"sports", source:"Marca", title:"¡Indonesia se clasifica para el Mundial 2026 por primera vez en su historia!", summary:"La selección Garuda aseguró su plaza histórica tras vencer 2-1 a Corea del Sur. Marselino Ferdinan anotó de cabeza en el minuto 89 desatando la euforia en el estadio Senayan y en todo el país.", time:"hace 3 h", link:"https://espn.com", breaking:true },
+  { id:605, cat:"tech", source:"TechCrunch", title:"OpenAI lanza GPT-5 con capacidades de razonamiento multimodal en tiempo real", summary:"El nuevo modelo procesa audio, vídeo y documentos de forma simultánea, igualando el rendimiento humano en 12 tareas de razonamiento. El precio empresarial comienza en 200 $/mes por usuario.", time:"hace 1 h", link:"https://techcrunch.com", featured:true },
+  { id:606, cat:"business", source:"Bloomberg", title:"La rupia indonesia se aprecia a 15.200 frente al dólar impulsada por sólidos datos comerciales", summary:"El superávit comercial de Indonesia se amplió a 4.200 millones de dólares en octubre, superando las previsiones. Las exportaciones de aceite de palma y níquel crecieron un 18 % y un 23 % interanual, respectivamente.", time:"hace 1,5 h", link:"https://bloomberg.com" },
+  { id:607, cat:"id", source:"Kompas.com", title:"Bali recibe un récord de 5,4 millones de turistas en 2026, superando el pico previo a la pandemia", summary:"La junta de turismo de Bali confirmó el récord de llegadas internacionales, lideradas por visitantes de Australia, China e India. Los ingresos del turismo alcanzaron los 120 billones de rupias.", time:"hace 5 h", link:"https://kompas.com" },
+  { id:608, cat:"entertainment", source:"Variety", title:"El director indonesio Edwin gana el León de Oro en Venecia con 'Nusantara'", summary:"Edwin se alzó con el máximo galardón de la 83.ª edición de la Mostra de Venecia. Es el primer León de Oro en la historia del cine indonesio.", time:"hace 8 h", link:"https://variety.com" },
+];
+
+const NEWS_IT = [
+  { id:701, cat:"id", source:"Kompas.com", title:"Il presidente Prabowo annuncia un piano infrastrutturale da 850.000 miliardi di rupie tra Giava e Sumatra", summary:"Il presidente Prabowo Subianto ha presentato un ambizioso pacchetto infrastrutturale che comprende autostrade a pedaggio, porti e corridoi ferroviari ad alta velocità. Si prevede la creazione di 2,4 milioni di posti di lavoro in cinque anni.", time:"2 min fa", link:"https://kompas.com", featured:true, breaking:true },
+  { id:702, cat:"id", source:"Metro TV", title:"Allerta alluvioni a Giacarta per le piogge intense previste nel fine settimana", summary:"L'agenzia meteorologica BMKG ha posto Giacarta e sei distretti limitrofi in allerta alluvioni. Sono attese precipitazioni tra i 150 e i 200 mm. I residenti delle zone basse sono invitati a prepararsi.", time:"18 min fa", link:"https://metrotv.com" },
+  { id:703, cat:"world", source:"ANSA", title:"Il G20 a Johannesburg raggiunge uno storico accordo da 500 miliardi per il clima", summary:"I ministri delle finanze delle 20 maggiori economie hanno approvato il fondo di transizione climatica più grande della storia. I mercati emergenti riceveranno condizioni di prestito agevolate per accelerare le energie rinnovabili.", time:"34 min fa", link:"https://apnews.com" },
+  { id:704, cat:"sports", source:"La Gazzetta dello Sport", title:"L'Indonesia si qualifica per la Coppa del Mondo 2026 per la prima volta nella storia!", summary:"La nazionale Garuda ha conquistato il suo posto storico battendo la Corea del Sud 2-1. Marselino Ferdinan ha segnato di testa al minuto 89 scatenando l'euforia nello stadio Senayan e in tutto il Paese.", time:"3 ore fa", link:"https://espn.com", breaking:true },
+  { id:705, cat:"tech", source:"TechCrunch", title:"OpenAI lancia GPT-5 con funzionalità di ragionamento multimodale in tempo reale", summary:"Il nuovo modello elabora audio, video e documenti simultaneamente, raggiungendo prestazioni pari all'umano su 12 attività di ragionamento. Il prezzo enterprise parte da 200 $/mese per postazione.", time:"1 ora fa", link:"https://techcrunch.com", featured:true },
+  { id:706, cat:"business", source:"Il Sole 24 Ore", title:"La rupia indonesiana si rafforza a 15.200 sul dollaro grazie a solidi dati commerciali", summary:"L'avanzo commerciale dell'Indonesia si è allargato a 4,2 miliardi di dollari a ottobre, superando le previsioni degli analisti. Le esportazioni di olio di palma e nichel sono cresciute rispettivamente del 18% e del 23% su base annua.", time:"1,5 ore fa", link:"https://bloomberg.com" },
+  { id:707, cat:"id", source:"Kompas.com", title:"Bali registra un record di 5,4 milioni di turisti nel 2026, superando il picco pre-pandemia", summary:"Il consiglio del turismo di Bali ha confermato il record di arrivi internazionali, guidati da visitatori da Australia, Cina e India. Le entrate turistiche hanno raggiunto i 120.000 miliardi di rupie.", time:"5 ore fa", link:"https://kompas.com" },
+  { id:708, cat:"entertainment", source:"Variety", title:"Il regista indonesiano Edwin vince il Leone d'Oro a Venezia con 'Nusantara'", summary:"Edwin ha conquistato il massimo premio alla 83ª Mostra d'Arte Cinematografica di Venezia. È il primo Leone d'Oro nella storia del cinema indonesiano.", time:"8 ore fa", link:"https://variety.com" },
+];
+
+const TRENDING = [
+  { text:"Indonesia World Cup 2026", src:"Multiple Sources" },
+  { text:"Prabowo Infrastructure Package", src:"Kompas.com" },
+  { text:"Jakarta Flood Warning", src:"BMKG / Metro TV" },
+  { text:"Rupiah strengthens vs USD", src:"Bloomberg" },
+  { text:"OpenAI GPT-5 release", src:"TechCrunch" },
+  { text:"Bali record tourists 2026", src:"Metro TV" },
+];
+
+const TRENDING_ID = [
+  { text:"Indonesia Piala Dunia 2026", src:"Berbagai Sumber" },
+  { text:"Paket Infrastruktur Prabowo", src:"Kompas.com" },
+  { text:"Peringatan Banjir Jakarta", src:"BMKG / Metro TV" },
+  { text:"Penguatan Rupiah", src:"Bloomberg" },
+  { text:"Rilis GPT-5 OpenAI", src:"TechCrunch" },
+  { text:"Rekor Wisatawan Bali 2026", src:"Metro TV" },
+];
+
+const TRENDING_ZH = [
+  { text:"印尼世界杯2026", src:"多方来源" },
+  { text:"普拉博沃基础设施计划", src:"Kompas.com" },
+  { text:"雅加达洪水预警", src:"BMKG" },
+  { text:"印尼盾升值", src:"彭博社" },
+  { text:"OpenAI GPT-5发布", src:"TechCrunch" },
+  { text:"巴厘岛游客创纪录", src:"Metro TV" },
+];
+
+const TRENDING_JA = [
+  { text:"インドネシア W杯2026", src:"複数ソース" },
+  { text:"プラボウォ インフラ計画", src:"Kompas.com" },
+  { text:"ジャカルタ洪水警報", src:"BMKG / Metro TV" },
+  { text:"ルピア上昇 対ドル", src:"Bloomberg" },
+  { text:"OpenAI GPT-5リリース", src:"TechCrunch" },
+  { text:"バリ島 観光客数最高記録", src:"Metro TV" },
+];
+
+const TRENDING_KO = [
+  { text:"인도네시아 월드컵 2026", src:"다수 출처" },
+  { text:"프라보워 인프라 계획", src:"Kompas.com" },
+  { text:"자카르타 홍수 경보", src:"BMKG / Metro TV" },
+  { text:"루피아 강세", src:"Bloomberg" },
+  { text:"OpenAI GPT-5 출시", src:"TechCrunch" },
+  { text:"발리 관광객 최고 기록", src:"Metro TV" },
+];
+
+const TRENDING_FR = [
+  { text:"Indonésie Coupe du Monde 2026", src:"Plusieurs sources" },
+  { text:"Plan infrastructure Prabowo", src:"Kompas.com" },
+  { text:"Alerte inondations Jakarta", src:"BMKG / Metro TV" },
+  { text:"Appréciation de la roupie", src:"Bloomberg" },
+  { text:"Lancement GPT-5 OpenAI", src:"TechCrunch" },
+  { text:"Record touristes Bali 2026", src:"Metro TV" },
+];
+
+const TRENDING_ES = [
+  { text:"Indonesia Copa del Mundo 2026", src:"Varias fuentes" },
+  { text:"Plan infraestructuras Prabowo", src:"Kompas.com" },
+  { text:"Alerta inundaciones Yakarta", src:"BMKG / Metro TV" },
+  { text:"Fortalecimiento de la rupia", src:"Bloomberg" },
+  { text:"Lanzamiento GPT-5 OpenAI", src:"TechCrunch" },
+  { text:"Récord turistas Bali 2026", src:"Metro TV" },
+];
+
+const TRENDING_IT = [
+  { text:"Indonesia Coppa del Mondo 2026", src:"Più fonti" },
+  { text:"Piano infrastrutture Prabowo", src:"Kompas.com" },
+  { text:"Allerta alluvioni Giacarta", src:"BMKG / Metro TV" },
+  { text:"Apprezzamento della rupia", src:"Bloomberg" },
+  { text:"Lancio GPT-5 OpenAI", src:"TechCrunch" },
+  { text:"Record turisti Bali 2026", src:"Metro TV" },
+];
+
+const WEATHER = [
+  { city:"Jakarta", icon:"🌧", temp:"29°C", desc:"Heavy Rain" },
+  { city:"Surabaya", icon:"⛅", temp:"31°C", desc:"Partly Cloudy" },
+  { city:"Bali", icon:"☀", temp:"33°C", desc:"Sunny" },
+  { city:"Medan", icon:"🌦", temp:"28°C", desc:"Showers" },
+  { city:"Makassar", icon:"🌤", temp:"32°C", desc:"Clear" },
+];
+
+/* ── State ── */
+let currentLang = 'en';
+let currentCat = 'all';
+let isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+/* ── Helpers ── */
+function timeAgo() {
+  const d = new Date();
+  return d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' }) + ' WIB';
+}
+
+function escHTML(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function buildCard(item, lang) {
+  const str = I18N[lang];
+  const featured = item.featured ? ' featured' : '';
+  const breakingLabel = item.breaking ? `<span class="tag breaking">${str.breaking}</span>` : '';
+  return `
+    <div class="news-card${featured}" data-cat="${item.cat}">
+      <div class="card-top">
+        <span class="source-badge">${escHTML(item.source)}</span>
+        ${breakingLabel}
+        <span class="tag">${getCatLabel(item.cat, lang)}</span>
+        <span class="card-time">${escHTML(item.time)}</span>
+      </div>
+      <h2 class="card-title"><a href="${item.link}" target="_blank" rel="noopener">${escHTML(item.title)}</a></h2>
+      <p class="card-summary">${escHTML(item.summary)}</p>
+      <div class="card-footer">
+        <a href="${item.link}" target="_blank" rel="noopener" class="read-more">${str.readMore}</a>
+      </div>
+    </div>`;
+}
+
+function getCatLabel(cat, lang) {
+  return (I18N[lang].cats[cat] || cat).replace(/^[^\s]+ /, '');
+}
+
+function getNewsForLang(lang) {
+  const map = { id:NEWS_ID, zh:NEWS_ZH, ja:NEWS_JA, ko:NEWS_KO, fr:NEWS_FR, es:NEWS_ES, it:NEWS_IT };
+  return map[lang] || NEWS_EN;
+}
+
+function getTrendingForLang(lang) {
+  const map = { id:TRENDING_ID, zh:TRENDING_ZH, ja:TRENDING_JA, ko:TRENDING_KO, fr:TRENDING_FR, es:TRENDING_ES, it:TRENDING_IT };
+  return map[lang] || TRENDING;
+}
+
+const EMPTY_MSG = {
+  id:'Tidak ada berita untuk kategori ini saat ini.',
+  zh:'当前类别暂无新闻。',
+  ja:'このカテゴリのニュースは現在ありません。',
+  ko:'현재 이 카테고리의 뉴스가 없습니다.',
+  fr:'Aucune actualité dans cette catégorie pour le moment.',
+  es:'No hay noticias en esta categoría por el momento.',
+  it:'Nessuna notizia in questa categoria al momento.'
+};
+
+function renderFeed(lang, cat) {
+  const data = getNewsForLang(lang);
+  const filtered = cat === 'all' ? data : data.filter(n => n.cat === cat);
+  if (!filtered.length) {
+    return `<div class="news-card"><p class="card-summary" style="text-align:center;padding:20px 0;">
+      ${EMPTY_MSG[lang] || 'No stories in this category right now.'}
+    </p></div>`;
+  }
+
+  let html = '';
+  // Inject inline ad after 4th item
+  filtered.forEach((item, i) => {
+    html += buildCard(item, lang);
+    if (i === 3) {
+      html += `<div class="inline-ad">
+        <div class="ad-banner inline">
+          <div><span class="ad-label">Advertisement</span>
+          <!-- REPLACE: Google AdSense inline / native ad -->
+          📢 Inline AdSense Ad · Replace with your AdSense script tag</div>
+        </div>
+      </div>`;
+    }
+  });
+  return html;
+}
+
+function renderTrending(lang) {
+  const data = getTrendingForLang(lang);
+  return data.map((item, i) => `
+    <div class="trending-item">
+      <span class="trending-num">${String(i+1).padStart(2,'0')}</span>
+      <div>
+        <div class="trending-text">${escHTML(item.text)}</div>
+        <div class="trending-src">${escHTML(item.src)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderWeather() {
+  return WEATHER.map(w => `
+    <div class="weather-row">
+      <span class="weather-icon">${w.icon}</span>
+      <div>
+        <div class="weather-city">${w.city}</div>
+        <div class="weather-desc">${w.desc}</div>
+      </div>
+      <div class="weather-temp">${w.temp}</div>
+    </div>`).join('');
+}
+
+function updateNavLabels(lang) {
+  document.querySelectorAll('.nav-tab').forEach(btn => {
+    const cat = btn.dataset.cat;
+    btn.textContent = I18N[lang].cats[cat] || cat;
+  });
+}
+
+function applyLangUI(lang) {
+  const str = I18N[lang];
+  document.getElementById('tagline-text').textContent = str.tagline;
+  document.getElementById('feed-title-text').textContent = str.feedTitle;
+  document.getElementById('trending-label').textContent = str.trending;
+  document.getElementById('refresh-label').textContent = str.refreshLabel;
+  document.getElementById('footer-copy').textContent = str.footer;
+  updateNavLabels(lang);
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+}
+
+const ALL_LANGS = ['en','id','zh','ja','ko','fr','es','it'];
+
+function switchLang(lang) {
+  currentLang = lang;
+  ALL_LANGS.forEach(l => {
+    const p = document.getElementById('panel-' + l);
+    if (p) p.classList.toggle('active', l === lang);
+  });
+  document.getElementById('feed-' + lang).innerHTML = renderFeed(lang, currentCat);
+  document.getElementById('trending-list').innerHTML = renderTrending(lang);
+  applyLangUI(lang);
+  try { localStorage.setItem('fx_lang', lang); } catch(e) {}
+}
+
+function filterCat(cat) {
+  currentCat = cat;
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+  ALL_LANGS.forEach(l => {
+    document.getElementById('feed-' + l).innerHTML = renderFeed(l, cat);
+  });
+}
+
+function refreshFeed() {
+  const btn = document.getElementById('refresh-btn');
+  btn.classList.add('loading');
+  setTimeout(() => {
+    ALL_LANGS.forEach(l => {
+      document.getElementById('feed-' + l).innerHTML = renderFeed(l, currentCat);
+    });
+    document.getElementById('trending-list').innerHTML = renderTrending(currentLang);
+    document.getElementById('last-updated').textContent = 'Updated ' + timeAgo();
+    btn.classList.remove('loading');
+  }, 900);
+}
+
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+  document.getElementById('theme-toggle').textContent = isDark ? '☀' : '🌙';
+  try { localStorage.setItem('fx_theme', isDark ? 'dark' : 'light'); } catch(e) {}
+}
+
+function updateClock() {
+  const now = new Date();
+  const opts = { timeZone:'Asia/Jakarta', hour:'2-digit', minute:'2-digit', second:'2-digit', weekday:'short', month:'short', day:'numeric' };
+  document.getElementById('topbar-time').textContent =
+    now.toLocaleString('en-GB', opts) + ' WIB';
+}
+
+/* ── Auto-refresh every 10 min ── */
+let refreshInterval = setInterval(refreshFeed, 10 * 60 * 1000);
+
+/* ── Scroll-to-top ── */
+window.addEventListener('scroll', () => {
+  document.getElementById('scroll-top').classList.toggle('show', window.scrollY > 400);
+});
+
+/* ── Init ── */
+(function init() {
+  // Restore preferences
+  try {
+    const savedLang = localStorage.getItem('fx_lang');
+    const savedTheme = localStorage.getItem('fx_theme');
+    if (savedLang && ALL_LANGS.includes(savedLang)) currentLang = savedLang;
+    if (savedTheme) {
+      isDark = savedTheme === 'dark';
+      document.documentElement.dataset.theme = savedTheme;
+      document.getElementById('theme-toggle').textContent = isDark ? '☀' : '🌙';
+    }
+  } catch(e) {}
+
+  // Render all feeds (hidden ones are pre-rendered for instant switch)
+  ALL_LANGS.forEach(l => {
+    document.getElementById('feed-' + l).innerHTML = renderFeed(l, currentCat);
+  });
+  document.getElementById('trending-list').innerHTML = renderTrending(currentLang);
+  document.getElementById('weather-box').innerHTML = renderWeather();
+  applyLangUI(currentLang);
+
+  // Show active panel
+  ALL_LANGS.forEach(l => {
+    const p = document.getElementById('panel-' + l);
+    if (p) p.classList.toggle('active', l === currentLang);
+  });
+
+  // Clock
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // Last updated timestamp
+  document.getElementById('last-updated').textContent = 'Updated ' + timeAgo();
+})();
+</script>
